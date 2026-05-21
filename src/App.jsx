@@ -42,7 +42,7 @@ export default function App() {
 
   const [search, setSearch] = useState("");
   const [darkMode, setDarkMode] = useState(false);
-  const [speechRate, setSpeechRate] = useState(0.9);
+  const [speechRate, setSpeechRate] = useState(1));
 
   const [newKorean, setNewKorean] = useState("");
   const [newEnglish, setNewEnglish] = useState("");
@@ -456,7 +456,7 @@ export default function App() {
         <input
           type="range"
           min="0.5"
-          max="1.3"
+          max="1.5"
           step="0.1"
           value={speechRate}
           onChange={(e) => setSpeechRate(Number(e.target.value))}
