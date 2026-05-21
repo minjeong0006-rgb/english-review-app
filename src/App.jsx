@@ -33,6 +33,8 @@ export default function App() {
 
   const [activeFolder, setActiveFolder] = useState("review");
   const [activeCategory, setActiveCategory] = useState("All");
+  const [showCategories, setShowCategories] = useState(false);
+
   const [newCategoryName, setNewCategoryName] = useState("");
   const [editingCategory, setEditingCategory] = useState(null);
   const [editingCategoryName, setEditingCategoryName] = useState("");
@@ -178,7 +180,7 @@ export default function App() {
 
   const speakEnglish = (text) => {
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = "en-US";
+    utterance.lang = "en-AU";
     utterance.rate = speechRate;
     speechSynthesis.cancel();
     speechSynthesis.speak(utterance);
@@ -285,7 +287,14 @@ export default function App() {
     >
       <h1 style={{ textAlign: "center" }}>📚 English Review App</h1>
 
-      <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
+      <div
+        style={{
+          display: "flex",
+          gap: 8,
+          marginBottom: 10,
+          flexWrap: "wrap",
+        }}
+      >
         <button onClick={() => setDarkMode(!darkMode)}>
           {darkMode ? "☀️ 라이트모드" : "🌙 다크모드"}
         </button>
@@ -296,6 +305,10 @@ export default function App() {
           📂 데이터 불러오기
         </button>
 
+        <button onClick={() => setShowCategories(!showCategories)}>
+          📁 카테고리 폴더
+        </button>
+
         <input
           ref={fileInputRef}
           type="file"
@@ -304,6 +317,139 @@ export default function App() {
           style={{ display: "none" }}
         />
       </div>
+
+      {showCategories && (
+        <div
+          style={{
+            border: "1px solid #ccc",
+            padding: 15,
+            borderRadius: 10,
+            marginBottom: 20,
+            backgroundColor: card,
+          }}
+        >
+          <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
+            <input
+              placeholder="새 카테고리 이름"
+              value={newCategoryName}
+              onChange={(e) => setNewCategoryName(e.target.value)}
+              style={{ flex: 1, padding: 10 }}
+            />
+            <button onClick={addCategory}>폴더 생성</button>
+          </div>
+
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+            <button
+              onClick={() => setActiveCategory("All")}
+              style={{
+                padding: 10,
+                backgroundColor:
+                  activeCategory === "All" ? "#dbeafe" : "white",
+              }}
+            >
+              📂 전체 ({notes.length})
+            </button>
+
+            {categories.map((category) => (
+              <div
+                key={category}
+                style={{
+                  display: "flex",
+                  gap: 4,
+                  alignItems: "center",
+                  position: "relative",
+                }}
+              >
+                {editingCategory === category ? (
+                  <>
+                    <input
+                      value={editingCategoryName}
+                      onChange={(e) =>
+                        setEditingCategoryName(e.target.value)
+                      }
+                      style={{ padding: 10, width: 120 }}
+                    />
+
+                    <button onClick={saveCategoryName}>저장</button>
+
+                    <button
+                      onClick={() => {
+                        setEditingCategory(null);
+                        setEditingCategoryName("");
+                        setOpenCategoryMenu(null);
+                      }}
+                    >
+                      취소
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      onClick={() => setActiveCategory(category)}
+                      style={{
+                        padding: 10,
+                        backgroundColor:
+                          activeCategory === category ? "#dbeafe" : "white",
+                      }}
+                    >
+                      📁 {category} ({categoryCount(category)})
+                    </button>
+
+                    <button
+                      onClick={() =>
+                        setOpenCategoryMenu(
+                          openCategoryMenu === category ? null : category
+                        )
+                      }
+                      style={{ padding: "10px 12px" }}
+                    >
+                      ▼
+                    </button>
+
+                    {openCategoryMenu === category && (
+                      <div
+                        style={{
+                          position: "absolute",
+                          top: "42px",
+                          right: 0,
+                          backgroundColor: "white",
+                          color: "#111827",
+                          border: "1px solid #ccc",
+                          borderRadius: 8,
+                          padding: 8,
+                          zIndex: 10,
+                          boxShadow: "0 4px 10px rgba(0,0,0,0.15)",
+                        }}
+                      >
+                        <button
+                          onClick={() => startEditCategory(category)}
+                          style={{
+                            display: "block",
+                            width: "100%",
+                            marginBottom: 6,
+                          }}
+                        >
+                          이름 수정
+                        </button>
+
+                        <button
+                          onClick={() => deleteCategory(category)}
+                          style={{
+                            display: "block",
+                            width: "100%",
+                          }}
+                        >
+                          삭제
+                        </button>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div style={{ marginBottom: 15 }}>
         발음 속도: {speechRate}
@@ -339,136 +485,6 @@ export default function App() {
         >
           ❗ 틀린 문장 ({wrongCount})
         </button>
-      </div>
-
-      <div
-        style={{
-          border: "1px solid #ccc",
-          padding: 15,
-          borderRadius: 10,
-          marginBottom: 20,
-          backgroundColor: card,
-        }}
-      >
-        <h2 style={{ textAlign: "center" }}>📁 카테고리 폴더</h2>
-
-        <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
-          <input
-            placeholder="새 카테고리 이름"
-            value={newCategoryName}
-            onChange={(e) => setNewCategoryName(e.target.value)}
-            style={{ flex: 1, padding: 10 }}
-          />
-          <button onClick={addCategory}>폴더 생성</button>
-        </div>
-
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-          <button
-            onClick={() => setActiveCategory("All")}
-            style={{
-              padding: 10,
-              backgroundColor: activeCategory === "All" ? "#dbeafe" : "white",
-            }}
-          >
-            📂 전체 ({notes.length})
-          </button>
-
-          {categories.map((category) => (
-            <div
-              key={category}
-              style={{
-                display: "flex",
-                gap: 4,
-                alignItems: "center",
-                position: "relative",
-              }}
-            >
-              {editingCategory === category ? (
-                <>
-                  <input
-                    value={editingCategoryName}
-                    onChange={(e) => setEditingCategoryName(e.target.value)}
-                    style={{ padding: 10, width: 120 }}
-                  />
-
-                  <button onClick={saveCategoryName}>저장</button>
-
-                  <button
-                    onClick={() => {
-                      setEditingCategory(null);
-                      setEditingCategoryName("");
-                      setOpenCategoryMenu(null);
-                    }}
-                  >
-                    취소
-                  </button>
-                </>
-              ) : (
-                <>
-                  <button
-                    onClick={() => setActiveCategory(category)}
-                    style={{
-                      padding: 10,
-                      backgroundColor:
-                        activeCategory === category ? "#dbeafe" : "white",
-                    }}
-                  >
-                    📁 {category} ({categoryCount(category)})
-                  </button>
-
-                  <button
-                    onClick={() =>
-                      setOpenCategoryMenu(
-                        openCategoryMenu === category ? null : category
-                      )
-                    }
-                    style={{ padding: "10px 12px" }}
-                  >
-                    ▼
-                  </button>
-
-                  {openCategoryMenu === category && (
-                    <div
-                      style={{
-                        position: "absolute",
-                        top: "42px",
-                        right: 0,
-                        backgroundColor: "white",
-                        color: "#111827",
-                        border: "1px solid #ccc",
-                        borderRadius: 8,
-                        padding: 8,
-                        zIndex: 10,
-                        boxShadow: "0 4px 10px rgba(0,0,0,0.15)",
-                      }}
-                    >
-                      <button
-                        onClick={() => startEditCategory(category)}
-                        style={{
-                          display: "block",
-                          width: "100%",
-                          marginBottom: 6,
-                        }}
-                      >
-                        이름 수정
-                      </button>
-
-                      <button
-                        onClick={() => deleteCategory(category)}
-                        style={{
-                          display: "block",
-                          width: "100%",
-                        }}
-                      >
-                        삭제
-                      </button>
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
-          ))}
-        </div>
       </div>
 
       <input
@@ -705,20 +721,7 @@ export default function App() {
                 </button>
 
                 <button
-                  onClick={() =>
-                    window.open(
-                      `https://chat.openai.com/?q=${encodeURIComponent(
-                        `Please help me study this English sentence.
-
-Korean: ${note.korean}
-English: ${note.english}
-Memo: ${note.memo}
-
-Please explain it naturally and give me similar practice sentences.`
-                      )}`,
-                      "_blank"
-                    )
-                  }
+                  onClick={() => window.open("https://chat.openai.com/", "_blank")}
                   style={{ marginLeft: 8 }}
                 >
                   🤖 AI 도움받기
