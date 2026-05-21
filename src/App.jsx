@@ -42,7 +42,7 @@ export default function App() {
 
   const [search, setSearch] = useState("");
   const [darkMode, setDarkMode] = useState(false);
-  const [speechRate, setSpeechRate] = useState(1));
+  const [speechRate, setSpeechRate] = useState(1);
 
   const [newKorean, setNewKorean] = useState("");
   const [newEnglish, setNewEnglish] = useState("");
@@ -180,7 +180,7 @@ export default function App() {
 
   const speakEnglish = (text) => {
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = "en-US";
+    utterance.lang = "en-AU";
     utterance.rate = speechRate;
     speechSynthesis.cancel();
     speechSynthesis.speak(utterance);
