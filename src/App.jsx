@@ -180,7 +180,7 @@ export default function App() {
 
   const speakEnglish = (text) => {
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = "en-AU";
+    utterance.lang = "en-US";
     utterance.rate = speechRate;
     speechSynthesis.cancel();
     speechSynthesis.speak(utterance);
